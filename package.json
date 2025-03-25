@@ -23,10 +23,10 @@
     "mongo",
     "builder"
   ],
-  "author": "DinhPlus (https://dinhplus.com)",
+  "author": "DinhPlus (https://github.com/dinhplus)",
   "repository": {
     "type": "github",
-    "url": "https://dinhplus.com/typed-query-filter",
+    "url": "https://github.com/dinhplus/typed-query-filter",
     "directory": "src",
     "branch": "master",
     "files": [
