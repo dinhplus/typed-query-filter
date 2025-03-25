@@ -3,7 +3,7 @@ export type Primitive = string | number | boolean | null | undefined;
 export type Operator =
   | '$eq' | '$ne' | '$gt' | '$gte' | '$lt' | '$lte'
   | '$in' | '$nin' | '$exists' | '$regex'
-  | '$not' | '$all' | '$size' | '$elemMatch' | '$where';
+  | '$not' | '$all' | '$size' | '$elemMatch' | '$where' | '$hasSome';
 
 export type FieldCondition =
   | { [K in Operator]?: any }

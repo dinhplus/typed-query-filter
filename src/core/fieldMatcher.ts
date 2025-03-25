@@ -16,6 +16,7 @@ export function createFieldMatcher(condition: FieldCondition): (val: any) => boo
       case '$lte': return (val: any) => val <= expected;
       case '$in': return (val: any) => expected.includes(val);
       case '$nin': return (val: any) => !expected.includes(val);
+      case '$hasSome': return (val: any) => Array.isArray(val) && val.some((v: any) => expected.includes(v));
       case '$exists': return (val: any) => expected ? val !== undefined : val === undefined;
       case '$regex': return (val: any) => typeof val === 'string' && new RegExp(expected).test(val);
       case '$not': return (val: any) => !createFieldMatcher(expected)(val);

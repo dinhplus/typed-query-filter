@@ -33,7 +33,7 @@ describe('filterData', () => {
     it('should work with QueryBuilder chain', () => {
         const query = new QueryBuilder<User>()
             .where('age', { $gte: 25 })
-            .where('tags', { $in: ['dev'] })
+            .where('tags', { $hasSome: ['dev'] })
             .build();
 
         const result = filterData(users, query);
