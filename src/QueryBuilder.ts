@@ -6,11 +6,11 @@ import { filterData } from './filterData';
 export class QueryBuilder<T extends object> {
   private query: QueryObject<T> = {};
   private _limit: number | undefined;
-  private _sort: Partial<Record<FlatKey<T>, 'asc' | 'desc'>> = {};
+  private _sort: Record<string, 'asc' | 'desc'> = {};
   private _select: FlatKey<T>[] = [];
 
   where<K extends FlatKey<T>>(field: K, condition: FieldCondition): this {
-    this.query[field] = condition;
+    (this.query as any)[field as string] = condition;
     return this;
   }
 
@@ -35,7 +35,7 @@ export class QueryBuilder<T extends object> {
   }
 
   sort(field: FlatKey<T>, direction: 'asc' | 'desc'): this {
-    this._sort[field] = direction;
+    this._sort[field as string] = direction;
     return this;
   }
 
@@ -67,7 +67,13 @@ export class QueryBuilder<T extends object> {
       return result.map(item => {
         const selected: Partial<T> = {};
         for (const key of this._select) {
-          selected[key.split('.')[0] as keyof T] = getNestedValue(item, key);
+          if (typeof key === 'string') {
+            const rootKey = key.split('.')[0] as keyof T;
+            selected[rootKey] = getNestedValue(item, key);
+          } else {
+            // Handle number or symbol keys directly
+            selected[key as keyof T] = getNestedValue(item, key);
+          }
         }
         return selected;
       });

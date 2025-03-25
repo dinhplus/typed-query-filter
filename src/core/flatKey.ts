@@ -1,12 +1,13 @@
 export type Join<K, P> = K extends string | number ? P extends string | number ? `${K}.${P}` : never : never;
 
-export type FlatKey<T> = {
-  [K in keyof T & (string | number)]: T[K] extends object
-    ? T[K] extends Array<any>
-      ? K
-      : K | Join<K, FlatKey<T[K]>>
-    : K
-}[keyof T & (string | number)];
+type Depth = [never, 0, 1, 2, 3, 4, 5]; // Limit recursion depth to 5
+export type FlatKey<T, D extends Depth[number] = 5> = D extends never
+  ? never
+  : T extends object
+  ? {
+      [K in keyof T]: K | (FlatKey<T[K], Depth[D]> extends infer FK ? `${K & string}.${FK & string}` : never);
+    }[keyof T]
+  : never;
 
 export function getFlatKeys<T>(obj: T, prefix = ''): FlatKey<T>[] {
   const keys: FlatKey<T>[] = [];

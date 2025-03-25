@@ -16,8 +16,8 @@ export function compileQuery<T>(query: QueryObject<T>): (obj: T) => boolean {
       const ors = (query as any).$or?.map(compileQuery) ?? [];
       const where = (query as any).$where;
 
-      const andMatch = ands.every(fn => fn(obj));
-      const orMatch = ors.length === 0 || ors.some(fn => fn(obj));
+      const andMatch = ands.every((fn: (arg0: T) => any) => fn(obj));
+      const orMatch = ors.length === 0 || ors.some((fn: (arg0: T) => any) => fn(obj));
       const whereMatch = typeof where === 'function' ? where(obj) : true;
 
       return andMatch && orMatch && whereMatch;
