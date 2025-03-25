@@ -1,6 +1,5 @@
-export type Join<K, P> = K extends string | number ? P extends string | number ? `${K}.${P}` : never : never;
-
-type Prev = [never, 0, 1, 2, 3, 4, 5];
+// FlatKey<T> with recursion depth limitation
+type Prev = [never, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
 export type FlatKey<T, D extends number = 3> = [D] extends [never]
   ? never
@@ -14,17 +13,22 @@ export type FlatKey<T, D extends number = 3> = [D] extends [never]
   }[keyof T & (string | number)]
   : never;
 
-export function getFlatKeys<T>(obj: T, prefix = ''): FlatKey<T>[] {
-  const keys: FlatKey<T>[] = [];
+export function getFlatKeys<T>(obj: T, prefix = '', depth: number = 3): FlatKey<T>[] {
+  const keys: string[] = [];
+
+  if (depth <= 0) return [];
 
   for (const key in obj) {
-    const fullKey = prefix ? `${prefix}.${key}` : key;
     const val = (obj as any)[key];
+    const fullKey = prefix ? `${prefix}.${key}` : key;
+
     if (typeof val === 'object' && val !== null && !Array.isArray(val)) {
-      keys.push(...getFlatKeys(val, fullKey) as FlatKey<T>[]);
+      keys.push(fullKey);
+      keys.push(...getFlatKeys(val, fullKey, depth - 1));
     } else {
-      keys.push(fullKey as FlatKey<T>);
+      keys.push(fullKey);
     }
   }
-  return keys;
+
+  return keys as FlatKey<T>[];
 }

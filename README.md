@@ -146,7 +146,7 @@ Using [Vitest](https://vitest.dev/) for blazing-fast testing.
 
 ## 📄 License
 
-MIT © 2025 [DinhPlus](https://github.com/your-github)
+MIT © 2025 [DinhPlus](https://github.com/dinhplus)
 
 ---
 
