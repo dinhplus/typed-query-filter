@@ -1,0 +1,33 @@
+{
+  "name": "typed-query-filter",
+  "version": "1.0.0",
+  "description": "Type-safe query filter engine for array of objects (MongoDB-like syntax)",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    "require": "./dist/index.cjs",
+    "import": "./dist/index.mjs"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "test": "vitest"
+  },
+  "keywords": [
+    "query",
+    "filter",
+    "typescript",
+    "mongo",
+    "builder"
+  ],
+  "author": "DinhPlus",
+  "license": "MIT",
+  "devDependencies": {
+    "tsup": "^7.2.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.6.1"
+  }
+}
