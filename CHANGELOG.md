@@ -1,9 +1,13 @@
 # Changelog
 
-All notable changes to the `typed-query-filter` package will be documented in this file.
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+### 1.0.7 (2025-03-26)
+
+
+### Features
+
+* support for template, callback, field based transformation ([723f280](https://github.com/dinhplus/typed-query-filter/commit/723f280cf85700bf8e732fbeb9a809a9997d8e2b))
 
 ## [1.0.6] - 2025-03-26
 

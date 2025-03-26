@@ -1,6 +1,6 @@
 {
   "name": "typed-query-filter",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Type-safe query filter engine for array of objects (MongoDB-like syntax)",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
@@ -22,7 +22,6 @@
     "release:major": "standard-version --release-as major",
     "release:patch": "standard-version --release-as patch",
     "prepare": "husky"
-    
   },
   "keywords": [
     "query",
