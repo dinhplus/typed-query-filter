@@ -15,6 +15,7 @@
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "test": "vitest",
+    "test:ci": "vitest run --reporter=default",
     "playground": "nodemon -L --watch playground --watch src --ext ts,json --delay 0.5 --verbose --exec 'ts-node -P tsconfig.playground.json playground/index.ts'",
     "release": "standard-version",
     "release:minor": "standard-version --release-as minor",
@@ -44,6 +45,7 @@
       "CHANGELOG.md"
     ]
   },
+  "type": "module",
   "license": "MIT",
   "devDependencies": {
     "@commitlint/cli": "^19.8.0",
