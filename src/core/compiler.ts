@@ -24,6 +24,31 @@ export function compileQuery<T>(query: QueryObject<T>): (obj: T) => boolean {
     }
 
     const conditions = Object.entries(query).map(([field, condition]) => {
+      // Handle nested array paths (like 'posts.details.tags')
+      if (field.includes('.') && !isSpecialOperator(field)) {
+        return (obj: T) => {
+          const segments = field.split('.');
+          const firstSegment = segments[0] as keyof T;
+          const value = obj[firstSegment];
+
+          // If the first segment is an array, we need to traverse it
+          if (Array.isArray(value)) {
+            const remainingPath = segments.slice(1).join('.');
+            // Check if any array element matches the condition
+            return value.some(item => {
+              const nestedValue = getNestedValue(item, remainingPath as any);
+              const nestedMatcher = createFieldMatcher(condition as FieldCondition);
+              return nestedMatcher(nestedValue);
+            });
+          }
+
+          // Normal path traversal for non-array segments
+          const matcher = createFieldMatcher(condition as FieldCondition);
+          return matcher(getNestedValue(obj, field as FlatKey<T>));
+        };
+      }
+
+      // Regular field handling
       const matcher = createFieldMatcher(condition as FieldCondition);
       return (obj: T) => matcher(getNestedValue(obj, field as FlatKey<T>));
     });
@@ -33,4 +58,8 @@ export function compileQuery<T>(query: QueryObject<T>): (obj: T) => boolean {
 
   matcherCache.set(query, matcher);
   return matcher;
+}
+
+function isSpecialOperator(field: string): boolean {
+  return field.startsWith('$');
 }

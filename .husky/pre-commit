@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run tests
+npm test
+
+# # Run linter
+# npm run lint
+
+# # Check for type errors
+# npm run typecheck
+
+# You can add any other commands that should run before commit
+# For example:
+# npm run format-check
+# npm run build

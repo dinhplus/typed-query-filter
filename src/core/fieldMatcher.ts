@@ -16,12 +16,19 @@ export function createFieldMatcher(condition: FieldCondition): (val: any) => boo
       case '$lte': return (val: any) => val <= expected;
       case '$in': return (val: any) => expected.includes(val);
       case '$nin': return (val: any) => !expected.includes(val);
-      case '$hasSome': return (val: any) => Array.isArray(val) && val.some((v: any) => expected.includes(v));
+      case '$some': return (val: any) => Array.isArray(val) && val.some((v: any) => expected.includes(v));
       case '$exists': return (val: any) => expected ? val !== undefined : val === undefined;
       case '$regex': return (val: any) => typeof val === 'string' && new RegExp(expected).test(val);
       case '$not': return (val: any) => !createFieldMatcher(expected)(val);
       case '$all': return (val: any) => Array.isArray(val) && expected.every((v: any) => val.includes(v));
-      case '$size': return (val: any) => Array.isArray(val) && val.length === expected;
+      case '$size': return (val: any) => {
+        // If checking for size 0 and value is undefined or null, consider it as an empty array
+        if (expected === 0 && (val === undefined || val === null)) {
+          return true;
+        }
+        // Normal array size check
+        return Array.isArray(val) && val.length === expected;
+      };
       case '$elemMatch':
         const matcher = compileQuery(expected);
         return (val: any) => Array.isArray(val) && val.some((item: any) => matcher(item));
