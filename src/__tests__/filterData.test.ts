@@ -152,7 +152,7 @@ const users: User[] = [
     address: { city: 'London', country: 'UK' },
     scores: [88, 91, 86],
     joinDate: new Date('2022-02-10'),
-    
+
   }
 ];
 
@@ -161,7 +161,7 @@ describe('filterData - Basic Operators', () => {
     const result = filterData(users, { name: { $eq: 'Alice' } });
     expect(result.length).toBe(1);
     expect(result[0].name).toBe('Alice');
-    
+
     // Implicit $eq
     const implicitResult = filterData(users, { name: 'Alice' });
     expect(implicitResult).toEqual(result);
@@ -196,7 +196,7 @@ describe('filterData - Basic Operators', () => {
   it('should filter by regex ($regex)', () => {
     const result = filterData(users, { name: { $regex: /^[AB]/ } });
     expect(result.map(u => u.name)).toEqual(['Alice', 'Bob']);
-    
+
     // String regex
     const stringResult = filterData(users, { name: { $regex: '^[AB]' } });
     expect(stringResult).toEqual(result);
@@ -223,15 +223,15 @@ describe('filterData - Array Operators', () => {
     const result = filterData(users, { tags: { $some: ['dev'] } });
     expect(result.map(u => u.name)).toEqual(['Alice', 'Charlie']);
   });
-  
+
   it('should filter with $elemMatch operator', () => {
-    const result = filterData(users, { 
-      posts: { 
-        $elemMatch: { 
+    const result = filterData(users, {
+      posts: {
+        $elemMatch: {
           likes: { $gt: 100 },
           'details.published': true
-        } 
-      } 
+        }
+      }
     });
     expect(result.map(u => u.name)).toEqual(['Alice', 'Charlie']);
   });
@@ -239,7 +239,7 @@ describe('filterData - Array Operators', () => {
   it('should filter by array size ($size)', () => {
     const result = filterData(users, { posts: { $size: 0 } });
     expect(result.map(u => u.name)).toEqual(['David', 'Eve']);
-    
+
     const result2 = filterData(users, { posts: { $size: 3 } });
     expect(result2.map(u => u.name)).toEqual(['Charlie']);
   });
@@ -247,42 +247,44 @@ describe('filterData - Array Operators', () => {
 
 describe('filterData - Logical Operators', () => {
   it('should combine conditions with $and', () => {
-    const result = filterData(users, { 
+    const result = filterData(users, {
       $and: [
         { age: { $gt: 20 } },
         { isActive: true },
         { 'address.country': 'USA' }
-      ] 
+      ]
     });
     expect(result.map(u => u.name)).toEqual(['Alice', 'Charlie', 'David']);
   });
 
   it('should combine conditions with $or', () => {
-    const result = filterData(users, { 
+    const result = filterData(users, {
       $or: [
         { age: { $lt: 20 } },
         { 'address.country': 'UK' }
-      ] 
+      ]
     });
     expect(result.map(u => u.name)).toEqual(['Bob', 'Eve']);
   });
 
   it('should negate conditions with $not', () => {
-    const result = filterData(users, { 
-      isActive: { $not: true } 
+    const result = filterData(users, {
+      isActive: { $not: true }
     });
     expect(result.map(u => u.name)).toEqual(['Bob']);
   });
 
   it('should handle complex nested conditions', () => {
-    const result = filterData(users, { 
+    const result = filterData(users, {
       $and: [
         { age: { $gte: 20 } },
-        { $or: [
-          { tags: { $some: ['dev'] } },
-          { 'address.country': 'UK' }
-        ]}
-      ] 
+        {
+          $or: [
+            { tags: { $some: ['dev'] } },
+            { 'address.country': 'UK' }
+          ]
+        }
+      ]
     });
     expect(result.map(u => u.name)).toEqual(['Alice', 'Charlie', 'Eve']);
   });
@@ -295,9 +297,9 @@ describe('filterData - Nested Fields', () => {
   });
 
   it('should access deeply nested fields in arrays', () => {
-    const result = filterData(users, { 
-        
-      'posts.details.tags': { $some: ['aws'] } 
+    const result = filterData(users, {
+
+      'posts.details.tags': { $some: ['aws'] }
     });
     expect(result.map(u => u.name)).toEqual(['Charlie']);
   });
@@ -308,7 +310,7 @@ describe('QueryBuilder - Basic Methods', () => {
     const result = new QueryBuilder<User>()
       .where('age', { $gte: 30 })
       .filter(users);
-    
+
     expect(result.map(u => u.name)).toEqual(['Charlie', 'David']);
   });
 
@@ -317,7 +319,7 @@ describe('QueryBuilder - Basic Methods', () => {
       .where('isActive', true)
       .where('age', { $lt: 30 })
       .filter(users);
-    
+
     expect(result.map(u => u.name)).toEqual(['Alice', 'Eve']);
   });
 
@@ -328,7 +330,7 @@ describe('QueryBuilder - Basic Methods', () => {
         { 'address.country': 'UK' }
       ])
       .filter(users);
-    
+
     expect(result.map(u => u.name)).toEqual(['Bob', 'Eve']);
   });
 
@@ -339,7 +341,7 @@ describe('QueryBuilder - Basic Methods', () => {
         { isActive: true }
       ])
       .filter(users);
-    
+
     expect(result.map(u => u.name)).toEqual(['Alice', 'Charlie', 'David', 'Eve']);
   });
 
@@ -347,7 +349,7 @@ describe('QueryBuilder - Basic Methods', () => {
     const result = new QueryBuilder<User>()
       .custom(user => user.name.startsWith('A') || user.name.startsWith('E'))
       .filter(users);
-    
+
     expect(result.map(u => u.name)).toEqual(['Alice', 'Eve']);
   });
 
@@ -356,7 +358,7 @@ describe('QueryBuilder - Basic Methods', () => {
       .where('isActive', true)
       .and([
         { age: { $gte: 20 } },
-        { 
+        {
           $or: [
             { tags: { $some: ['dev'] } },
             { 'address.country': 'UK' }
@@ -364,7 +366,7 @@ describe('QueryBuilder - Basic Methods', () => {
         }
       ])
       .filter(users);
-    
+
     expect(result.map(u => u.name)).toEqual(['Alice', 'Charlie', 'Eve']);
   });
 });
@@ -374,7 +376,7 @@ describe('QueryBuilder - Sorting and Limiting', () => {
     const result = new QueryBuilder<User>()
       .sort('age', 'asc')
       .filter(users);
-    
+
     expect(result.map(u => u.name)).toEqual(['Bob', 'Eve', 'Alice', 'Charlie', 'David']);
   });
 
@@ -382,7 +384,7 @@ describe('QueryBuilder - Sorting and Limiting', () => {
     const result = new QueryBuilder<User>()
       .sort('age', 'desc')
       .filter(users);
-    
+
     expect(result.map(u => u.name)).toEqual(['David', 'Charlie', 'Alice', 'Eve', 'Bob']);
   });
 
@@ -391,7 +393,7 @@ describe('QueryBuilder - Sorting and Limiting', () => {
       .sort('age', 'desc')
       .limit(2)
       .filter(users);
-    
+
     expect(result.map(u => u.name)).toEqual(['David', 'Charlie']);
   });
 
@@ -399,7 +401,7 @@ describe('QueryBuilder - Sorting and Limiting', () => {
     const result = new QueryBuilder<User>()
       .sort('address.city', 'asc')
       .filter(users);
-    
+
     // Boston, Chicago, London, New York, San Francisco
     expect(result[0].name).toBe('Bob'); // Boston
     expect(result[4].name).toBe('Charlie'); // San Francisco
@@ -412,7 +414,7 @@ describe('QueryBuilder - Select/Projection', () => {
       .where('isActive', true)
       .select('name', 'age')
       .filter(users);
-    
+
     expect(result.length).toBe(4);
     expect(Object.keys(result[0]).sort()).toEqual(['age', 'name']);
     expect(result[0].name).toBe('Alice');
@@ -424,7 +426,7 @@ describe('QueryBuilder - Select/Projection', () => {
       .where('isActive', true)
       .select('name', 'address')
       .filter(users);
-    
+
     expect(result.length).toBe(4);
     expect(Object.keys(result[0]).sort()).toEqual(['address', 'name']);
     expect(result[0].address.city).toBe('New York');
@@ -440,7 +442,7 @@ describe('QueryBuilder - Select/Projection', () => {
         tagCount: user.tags.length
       }))
       .filter(users);
-    
+
     expect(result.length).toBe(4);
     expect(Object.keys(result[0]).sort()).toEqual(['fullName', 'location', 'tagCount', 'yearsOld']);
     expect(result[0].fullName).toBe('ALICE');
@@ -457,7 +459,7 @@ describe('QueryBuilder - Select/Projection', () => {
         activeStatus: true
       })
       .filter(users);
-    
+
     expect(result.length).toBe(4);
     expect(Object.keys(result[0]).sort()).toEqual(['activeStatus', 'city', 'fullName', 'years']);
     expect(result[0].fullName).toBe('Alice');
@@ -473,7 +475,7 @@ describe('QueryBuilder - Select/Projection', () => {
         firstPostLikes: 'posts[0].likes'
       })
       .filter(users);
-    
+
     expect(result.length).toBe(1);
     expect(result[0].firstPostTitle).toBe('TypeScript Tips');
     expect(result[0].firstPostLikes).toBe(120);
@@ -492,7 +494,7 @@ describe('QueryBuilder - Select/Projection', () => {
         }]
       })
       .filter(users);
-    
+
     expect(result.length).toBe(1);
     expect(result[0].posts.length).toBe(2);
     expect(result[0].posts[0].title).toBe('TypeScript Tips');
@@ -516,7 +518,7 @@ describe('QueryBuilder - Select/Projection', () => {
         }]
       })
       .filter(users);
-    
+
     expect(result.length).toBe(1);
     expect(result[0].posts.length).toBe(2);
     expect(result[0].posts[0].comments.length).toBe(2);
@@ -534,7 +536,7 @@ describe('QueryBuilder - Combined Features', () => {
       .limit(2)
       .select('name', 'age', 'address.city')
       .filter(users);
-    
+
     expect(result.length).toBe(2);
     expect(result[0].name).toBe('David');
     expect(result[1].name).toBe('Charlie');
@@ -543,11 +545,11 @@ describe('QueryBuilder - Combined Features', () => {
 
   it('should work with complex array transformations and filtering', () => {
     const result = new QueryBuilder<User>()
-      .where('posts', { 
-        $elemMatch: { 
+      .where('posts', {
+        $elemMatch: {
           likes: { $gt: 100 },
           'details.published': true
-        } 
+        }
       })
       .select({
         name: 'name',
@@ -563,11 +565,209 @@ describe('QueryBuilder - Combined Features', () => {
         }]
       })
       .filter(users);
-    
+
     expect(result.map(u => u.name)).toEqual(['Alice', 'Charlie']);
     expect(result[0].topPosts[0].title).toBe('TypeScript Tips');
     expect(result[1].topPosts[0].popularity).toBe(200);
     expect(result[0].topPosts[0].commenters[0].user).toBe('Bob');
     expect(result[1].topPosts[0].tags).toContain('aws');
+  });
+});
+
+describe('Improved Nested Object Querying', () => {
+  it('should support intuitive nested object querying without $elemMatch', () => {
+
+    const traditionalResult = filterData(users, {
+      posts: {
+        $elemMatch: {
+          likes: { $gt: 100 },
+          'details.published': true
+        }
+      }
+    });
+
+
+    const intuitiveResult = filterData(users, {
+      posts: {
+        likes: { $gt: 100 },
+        'details.published': true
+      }
+    });
+
+
+    expect(intuitiveResult.map(u => u.name)).toEqual(traditionalResult.map(u => u.name));
+    expect(intuitiveResult.map(u => u.name)).toEqual(['Alice', 'Charlie']);
+  });
+
+  it('should support alternative nested object syntax', () => {
+
+    const traditionalResult = filterData(users, {
+      posts: {
+        $elemMatch: {
+          details: {
+            tags: { $some: ['typescript'] }
+          }
+        }
+      }
+    });
+
+
+    const alternativeResult = filterData(users, {
+      posts: {
+        details: {
+          tags: { $some: ['typescript'] }
+        }
+      }
+    });
+
+
+    expect(alternativeResult.map(u => u.name)).toEqual(traditionalResult.map(u => u.name));
+    expect(alternativeResult.map(u => u.name)).toEqual(['Alice']);
+  });
+
+  it('should handle complex deeply nested conditions', () => {
+
+    const result = filterData(users, {
+      posts: {
+        details: {
+          comments: {
+            user: 'Bob'
+          }
+        }
+      }
+    });
+
+    expect(result.map(u => u.name)).toEqual(['Alice']);
+  });
+
+  it('should support multiple conditions in nested queries', () => {
+
+    const result = filterData(users, {
+      posts: {
+        likes: { $gt: 100 },
+        details: {
+          tags: { $some: ['typescript'] },
+          published: true
+        }
+      }
+    });
+
+    expect(result.map(u => u.name)).toEqual(['Alice']);
+  });
+
+  it('should support QueryBuilder with intuitive nested syntax', () => {
+
+    const result = new QueryBuilder<User>()
+      .where('posts', {
+        likes: { $gt: 100 },
+        'details.published': true
+      })
+      .filter(users);
+
+    expect(result.map(u => u.name)).toEqual(['Alice', 'Charlie']);
+  });
+});
+
+describe('Enhanced Regex Support', () => {
+  it('should support $regex with RegExp objects', () => {
+    const result = filterData(users, { name: { $regex: /^[AB]/ } });
+    expect(result.map(u => u.name)).toEqual(['Alice', 'Bob']);
+  });
+
+  it('should support $regex with string patterns', () => {
+    const result = filterData(users, { name: { $regex: '^[AB]' } });
+    expect(result.map(u => u.name)).toEqual(['Alice', 'Bob']);
+  });
+
+  it('should support $regex with complex patterns', () => {
+    // Tìm tên có chứa ít nhất 4 ký tự và chữ cái 'i' (case-insensitive)
+    const result = filterData(users, { name: { $regex: /^(?=.*i).{4,}$/i } });
+    expect(result.map(u => u.name)).toEqual(['Alice', 'Charlie', 'David']);
+    
+    // Also test with string pattern and explicit flags
+    const result2 = filterData(users, { name: { $regex: '^(?=.*i).{4,}||i' } });
+    expect(result2.map(u => u.name)).toEqual(['Alice', 'Charlie', 'David']);
+  });
+
+  it('should support $regex with case insensitive patterns', () => {
+    // Tìm tên có chữ 'a' không phân biệt hoa thường
+    const result = filterData(users, { name: { $regex: /a/i } });
+    expect(result.map(u => u.name)).toEqual(['Alice', 'Charlie', 'David']);
+  });
+
+  it('should handle $regex with flags in string pattern', () => {
+    // Standard regex format with flags '/pattern/flags'
+    const result1 = filterData(users, { name: { $regex: '/a.*e$/i' } });
+    expect(result1.map(u => u.name)).toEqual(['Alice', 'Charlie']);
+    
+    // Alternative format with explicit flags 'pattern||flags'
+    const result2 = filterData(users, { name: { $regex: 'a.*e$||i' } });
+    expect(result2.map(u => u.name)).toEqual(['Alice', 'Charlie']);
+  });
+});
+
+describe('Deep Recursion and Performance', () => {
+  it('should handle deeply nested object queries without stack overflow', () => {
+    // Truy vấn lồng nhiều tầng để test khả năng xử lý đệ quy sâu
+    const result = filterData(users, {
+      posts: {
+        details: {
+          comments: {
+            user: 'Bob',
+            text: { $regex: /Great/ }
+          }
+        }
+      }
+    });
+
+    expect(result.length).toBe(1);
+    expect(result[0].name).toBe('Alice');
+  });
+
+  it('should handle complex queries with multiple nested conditions', () => {
+    // Kết hợp nhiều điều kiện lồng nhau và toán tử logic
+    const result = new QueryBuilder<User>()
+      .where('posts', {
+        details: {
+          tags: { $some: ['typescript', 'programming'] },
+          comments: {
+            user: { $in: ['Bob', 'Charlie'] },
+            text: { $regex: /article|learned/i }
+          }
+        }
+      })
+      .filter(users);
+
+    expect(result.map(u => u.name)).toEqual(['Alice']);
+  });
+
+  it('should optimize performance with deep nesting by using depth control', () => {
+
+    const deeplyNestedQuery = {
+      posts: {
+        details: {
+          comments: {
+            user: {
+              $regex: /^[A-Z]/
+            },
+            text: {
+              $regex: /.*/, // Tất cả text
+            }
+          },
+          tags: {
+            $some: ['typescript', 'aws', 'cloud']
+          },
+          published: true
+        },
+        likes: {
+          $gt: 0
+        }
+      }
+    };
+
+    // Thực hiện truy vấn không gây lỗi
+    expect(() => {
+      filterData(users, deeplyNestedQuery);
+    }).not.toThrow();
   });
 });

@@ -5,16 +5,25 @@ export type Operator =
   | '$in' | '$nin' | '$exists' | '$regex'
   | '$not' | '$all' | '$size' | '$elemMatch' | '$where' | '$some';
 
-export type FieldCondition =
+// Simplified type for all field conditions to avoid deep recursion
+export type FieldCondition<T = any> =
+  | T
   | { [K in Operator]?: any }
-  | Primitive;
+  | { [key: string]: any };
 
-export type LogicalQuery<T> = {
+// Simplified query object type
+export type QueryObject<T> = {
+  [K in keyof T | string]?: FieldCondition | QueryObject<any>;
+} | {
   $and?: QueryObject<T>[];
   $or?: QueryObject<T>[];
   $where?: (doc: T) => boolean;
+};
+
+// Export types for legacy compatibility
+export interface NestedCondition {
+  [key: string]: FieldCondition;
 }
 
-export type QueryObject<T> = LogicalQuery<T> | {
-  [K in keyof T | string]?: FieldCondition;
-};
+// Safe flat key type for dot notation
+export type DotNotation<T> = string;

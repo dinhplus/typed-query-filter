@@ -9,36 +9,60 @@ export class QueryBuilder<T extends object> {
   private _sort: Record<string, 'asc' | 'desc'> = {};
   private _select: FlatKey<T>[] | ((item: T) => any) | Record<string, any> = [];
 
-  where<K extends FlatKey<T>>(field: K, condition: FieldCondition): this {
+  /**
+   * Add a field condition to the query
+   */
+  where<K extends keyof T | string>(field: K, condition: FieldCondition): this {
     (this.query as any)[field as string] = condition;
     return this;
   }
 
+  /**
+   * Add a logical AND condition
+   */
   and(queries: QueryObject<T>[]): this {
     this.query['$and'] = queries;
     return this;
   }
 
+  /**
+   * Add a logical OR condition
+   */
   or(queries: QueryObject<T>[]): this {
     this.query['$or'] = queries;
     return this;
   }
 
+  /**
+   * Add a custom function condition
+   */
   custom(fn: (doc: T) => boolean): this {
     this.query['$where'] = fn;
     return this;
   }
 
+  /**
+   * Limit the number of results
+   */
   limit(n: number): this {
     this._limit = n;
     return this;
   }
 
-  sort(field: FlatKey<T>, direction: 'asc' | 'desc'): this {
+  /**
+   * Sort results by field
+   */
+  sort<K extends keyof T | string>(field: K, direction: 'asc' | 'desc'): this {
     this._sort[field as string] = direction;
     return this;
   }
 
+  /**
+   * Select specific fields or transform results
+   * - Method 1: Specify field names as individual arguments
+   * - Method 2: Use a transform function
+   * - Method 3: Use a template object
+   */
   select<R>(...fields: (FlatKey<T> | ((item: T) => R) | Record<string, any>)[]): this {
     if (fields.length === 1) {
       const firstArg = fields[0];
@@ -61,10 +85,16 @@ export class QueryBuilder<T extends object> {
     return this;
   }
 
+  /**
+   * Build and return the query object
+   */
   build(): QueryObject<T> {
     return this.query;
   }
 
+  /**
+   * Filter data with the current query
+   */
   filter(data: T[]): any[] {
     let result = filterData(data, this.query);
 
@@ -74,29 +104,29 @@ export class QueryBuilder<T extends object> {
         // Use getNestedValue for deep path access
         const aVal = getNestedValue(a, key as any);
         const bVal = getNestedValue(b, key as any);
-        
+
         // Handle different types of values for comparison
         if (aVal === undefined && bVal === undefined) return 0;
         if (aVal === undefined) return dir === 'asc' ? -1 : 1;
         if (bVal === undefined) return dir === 'asc' ? 1 : -1;
-        
+
         // Compare strings case-insensitive
         if (typeof aVal === 'string' && typeof bVal === 'string') {
-          return dir === 'asc' 
-            ? aVal.localeCompare(bVal) 
+          return dir === 'asc'
+            ? aVal.localeCompare(bVal)
             : bVal.localeCompare(aVal);
         }
-        
+
         // Compare dates
         if (aVal instanceof Date && bVal instanceof Date) {
-          return dir === 'asc' 
-            ? aVal.getTime() - bVal.getTime() 
+          return dir === 'asc'
+            ? aVal.getTime() - bVal.getTime()
             : bVal.getTime() - aVal.getTime();
         }
-        
+
         // Default comparison for numbers and other types
-        return dir === 'asc' 
-          ? (aVal > bVal ? 1 : aVal < bVal ? -1 : 0) 
+        return dir === 'asc'
+          ? (aVal > bVal ? 1 : aVal < bVal ? -1 : 0)
           : (bVal > aVal ? 1 : bVal < aVal ? -1 : 0);
       });
     }
@@ -122,7 +152,7 @@ export class QueryBuilder<T extends object> {
               const rootKey = key.split('.')[0] as keyof T;
               let currentObj = selected;
               const parts = key.split('.');
-              
+
               // Create nested structure
               for (let i = 0; i < parts.length - 1; i++) {
                 const part = parts[i] as keyof typeof currentObj;
@@ -131,7 +161,7 @@ export class QueryBuilder<T extends object> {
                 }
                 currentObj = currentObj[part] as any;
               }
-              
+
               // Set the value at the leaf
               const lastPart = parts[parts.length - 1];
               currentObj[lastPart as keyof typeof currentObj] = getNestedValue(item, key as any);
@@ -161,19 +191,19 @@ export class QueryBuilder<T extends object> {
 
     for (const [key, value] of Object.entries(template)) {
       // Handle array with template [path, templateObj]
-      if (Array.isArray(value) && value.length === 2 && 
-          typeof value[0] === 'string' && 
-          typeof value[1] === 'object' && value[1] !== null) {
-        
+      if (Array.isArray(value) && value.length === 2 &&
+        typeof value[0] === 'string' &&
+        typeof value[1] === 'object' && value[1] !== null) {
+
         const arrayPath = value[0] as string;
         const arrayTemplate = value[1] as Record<string, any>;
-        
+
         // Get data from path
         const arrayData = getNestedValue(item, arrayPath as any);
-        
+
         if (Array.isArray(arrayData)) {
           // Apply template to each array element
-          result[key] = arrayData.map(arrayItem => 
+          result[key] = arrayData.map(arrayItem =>
             this.applyTemplateToItem(arrayItem, arrayTemplate)
           );
         } else {
@@ -202,7 +232,7 @@ export class QueryBuilder<T extends object> {
    */
   private applyTemplateToItem(item: any, template: Record<string, any>): any {
     const result: Record<string, any> = {};
-    
+
     for (const [key, value] of Object.entries(template)) {
       if (typeof value === 'string') {
         // Get value from path
@@ -210,18 +240,18 @@ export class QueryBuilder<T extends object> {
       } else if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
         // Recurse for nested objects
         result[key] = this.applyTemplateToItem(item, value);
-      } else if (Array.isArray(value) && value.length === 2 && 
-                typeof value[0] === 'string' && 
-                typeof value[1] === 'object' && value[1] !== null) {
+      } else if (Array.isArray(value) && value.length === 2 &&
+        typeof value[0] === 'string' &&
+        typeof value[1] === 'object' && value[1] !== null) {
         // Handle nested arrays
         const nestedArrayPath = value[0] as string;
         const nestedTemplate = value[1] as Record<string, any>;
-        
+
         // Get nested array
         const nestedArray = getNestedValue(item, nestedArrayPath as any);
-        
+
         if (Array.isArray(nestedArray)) {
-          result[key] = nestedArray.map(nestedItem => 
+          result[key] = nestedArray.map(nestedItem =>
             this.applyTemplateToItem(nestedItem, nestedTemplate)
           );
         } else {
@@ -232,7 +262,7 @@ export class QueryBuilder<T extends object> {
         result[key] = value;
       }
     }
-    
+
     return result;
   }
 }

@@ -1,4 +1,3 @@
-```markdown
 # 🧠 typed-query-filter
 
 > Type-safe, MongoDB-like query engine for JavaScript/TypeScript arrays — built for both frontend & backend.
@@ -9,12 +8,15 @@
 
 - ✅ Type-safe query engine for object arrays
 - ✅ MongoDB-like operators: `$eq`, `$gt`, `$in`, `$regex`, `$elemMatch`, `$and`, `$or`, `$where`, etc.
+- ✅ Intuitive nested object queries without requiring `$elemMatch` for simple cases
+- ✅ Enhanced regex support with multiple pattern formats
 - ✅ `QueryBuilder<T>` chain API with `.where()`, `.and()`, `.or()`, `.custom()`
 - ✅ `.sort()`, `.limit()`, `.select()` just like MongoDB
 - ✅ Nested field access with autocomplete (`user.address.city`)
 - ✅ Built-in type-safe helper: `FlatKey<T>`
 - ✅ Flexible projection with 3 different `select()` methods
 - ✅ Template-based array transformation
+- ✅ Optimized for deep recursive queries without stack overflows
 - ✅ Optional WebAssembly backend for high-performance filtering (coming soon)
 - ✅ Runs in both Node.js and modern browsers
 
@@ -102,7 +104,7 @@ const result = qb.filter(users);
 | `$gt`, `$gte` | Greater than / or equal             |
 | `$lt`, `$lte` | Less than / or equal                |
 | `$in`, `$nin` | Value is (not) in array             |
-| `$regex`      | Regex string match                  |
+| `$regex`      | Regex string match (supports RegExp objects, string patterns, and flags) |
 | `$exists`     | Field is defined or not             |
 | `$not`        | Invert a condition                  |
 | `$all`        | All values in array match           |
@@ -249,6 +251,67 @@ const fields = getFlatKeys<User>({
 
 > Useful for building dynamic filter UI with autocomplete
 
+### 📐 Intuitive Nested Object Queries
+
+You can now query nested arrays of objects without using `$elemMatch` for simple cases:
+
+```ts
+// Traditional query with $elemMatch
+const traditionalResult = filterData(users, { 
+  posts: { 
+    $elemMatch: { 
+      likes: { $gt: 100 },
+      'details.published': true
+    } 
+  } 
+});
+
+// New intuitive syntax (does the same thing)
+const intuitiveResult = filterData(users, {
+  posts: {
+    likes: { $gt: 100 },
+    'details.published': true
+  }
+});
+```
+
+### 🔍 Enhanced RegEx Support
+
+Multiple ways to use regex patterns:
+
+```ts
+// Using RegExp objects
+filterData(users, { name: { $regex: /^[AB]/ } });
+
+// Using string patterns
+filterData(users, { name: { $regex: '^[AB]' } });
+
+// Using string patterns with flags (format: '/pattern/flags')
+filterData(users, { name: { $regex: '/alice|bob/i' } });
+
+// Alternative explicit format for flags ('pattern||flags')
+filterData(users, { name: { $regex: 'alice|bob||i' } });
+```
+
+### 🔄 Deep Recursion Handling
+
+The library is optimized to handle deeply nested object queries without causing stack overflow errors:
+
+```ts
+// Deep nested query that works efficiently
+const result = filterData(users, {
+  posts: {
+    details: {
+      comments: {
+        user: 'Bob',
+        text: { $regex: /Great/ }
+      },
+      tags: { $some: ['typescript', 'programming'] }
+    }
+  }
+});
+```
+
 ---
 
 ## 🧪 Testing
@@ -281,4 +344,3 @@ MIT © 2025 [DinhPlus](https://github.com/dinhplus)
 PRs and issues welcome! This project is designed to scale with many types of data structures and support massive filtering use cases (with WASM coming).
 
 ---
-```

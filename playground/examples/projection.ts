@@ -3,7 +3,7 @@ import { users, User } from '../data/users';
 
 export function runProjectionExamples() {
   console.log('\n----- Projection Examples -----\n');
-  
+
   // Example 1: Select only name and email
 
   console.time('Users with only name and email:');
@@ -12,7 +12,7 @@ export function runProjectionExamples() {
     .filter(users);
   console.timeEnd('Users with only name and email:');
   console.log(namesAndEmails);
-  
+
   // Example 2: Select nested fields
   console.time('\nUsers with name and city:');
   const namesAndCities = new QueryBuilder<User>()
@@ -20,7 +20,7 @@ export function runProjectionExamples() {
     .filter(users);
   console.timeEnd('\nUsers with name and city:');
   console.log(namesAndCities);
-  
+
   // Example 3: Combine with filtering
   console.time('\nActive users with only ID and name:');
 
