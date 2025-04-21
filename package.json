@@ -1,6 +1,6 @@
 {
   "name": "typed-query-filter",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Type-safe query filter engine for array of objects (MongoDB-like syntax)",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
-    "test": "vitest",
+    "test": "vitest --watch",
     "test:ci": "vitest run --reporter=default",
     "playground": "nodemon -L --watch playground --watch src --ext ts,json --delay 0.5 --verbose --exec 'ts-node -P tsconfig.playground.json playground/index.ts'",
     "release": "standard-version",
@@ -44,7 +44,7 @@
       "CHANGELOG.md"
     ]
   },
-  "type": "module",
+  "type": "commonjs",
   "license": "MIT",
   "devDependencies": {
     "@commitlint/cli": "^19.8.0",
